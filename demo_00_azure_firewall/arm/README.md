@@ -5,4 +5,4 @@ This template creates a basic hub-and-spoke topology setup. It creates a Hub VNe
 Note that if you choose to deploy the VPN gateway, it may take up to 45 minutes to complete.
 
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Fazure-quickstart-templates%2Fmaster%2Fquickstarts%2Fmicrosoft.storage%2Fstorage-account-create%2Fazuredeploy.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/everton-o/az500/main/demo_00_azure_firewall/arm/azuredeploy.json)
