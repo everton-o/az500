@@ -1,0 +1,18 @@
+{
+   "$schema":"https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+   "contentVersion":"1.0.0.0",
+  "parameters": {
+    "winVmUser": {
+      "value": "adminuser2021"
+    },
+    "winVmPassword": {
+      "value": "RwGAAb3W!@"
+    },
+    "winVmDnsPrefix": {
+      "value": "hub"
+    },
+    "deployVpnGateway": {
+       "value": "No"
+    }
+  }
+}
