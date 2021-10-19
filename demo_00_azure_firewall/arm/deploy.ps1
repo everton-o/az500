@@ -15,7 +15,7 @@
 # Deploy resource
 New-AzResourceGroupDeployment `
     -Name 'deploy01' `
-    -ResourceGroupName $rg.ResourceGroupName `
+    -ResourceGroupName 'hubspoke-rg' `
     -TemplateFile $PSScriptRoot\azuredeploy.json `
     -TemplateParameterFile $PSScriptRoot\azuredeploy.parameters.json
 

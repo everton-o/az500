@@ -6,13 +6,10 @@
       "value": "adminuser2021"
     },
     "winVmPassword": {
-      "value": "RwGAAb3W!@"
+      "value": "RwGAAb2ass3W!@"
     },
     "winVmDnsPrefix": {
       "value": "hub"
-    },
-    "deployVpnGateway": {
-       "value": "No"
     }
   }
 }
