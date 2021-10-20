@@ -52,6 +52,8 @@
       "sharedSubnetName": "SharedSubnet",
       "sharedSubnetPrefix": "192.168.4.0/22",
       "winJmphostName": "winJmphostVm",
+      "winSpoke1hostName": "winDevhostName",
+      "winSpoke2hostName": "winPrdhostName",
       "devSpokeVnetName": "spokeDevVnet",
       "devSpokeVnetPrefix": "10.10.0.0/16",
       "prodSpokeVnetName": "spokeProdVnet",
@@ -63,9 +65,14 @@
       "devSpokeID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('devSpokeVnetName'))]",
       "prodSpokeID": "[resourceId('Microsoft.Network/virtualNetworks/', variables('prodSpokeVnetName'))]",
       "winVmNicName": "[concat(variables('winJmphostName'), 'NIC')]",
+      "winSpoke1VmNicName": "[concat(variables('winSpoke1hostName'), 'NIC')]",
+      "winSpoke2VmNicName": "[concat(variables('winSpoke2hostName'), 'NIC')]",
+
       "winVmStorageName": "[concat('hubwinvm',uniquestring(resourceGroup().id))]",
       "winNsgName": "winJmpHostNsg",
-      "winJmphostPublicIpName": "winJmphostVmPublicIp"
+      "winJmphostPublicIpName": "winJmphostVmPublicIp",
+      "winSpoke1hostPublicIpName": "winSpoke1hostPublicIp",
+      "winSpoke2hostPublicIpName": "winSpoke2hostPublicIp"
     },
     "resources": [
       {
@@ -271,6 +278,9 @@
           }
         }
       },
+      ///////////////////////////////////////////////////////////
+      // StartRegion - Jump host
+      ///////////////////////////////////////////////////////////
       {
         "comments": "Windows Jump-Hosts",
         "type": "Microsoft.Compute/virtualMachines",
@@ -348,6 +358,25 @@
         }
       },
       {
+        "comments": "Public IP (PIP) for Windows JumpHost",
+        "type": "Microsoft.Network/publicIPAddresses",
+        "sku": {
+          "name": "Basic",
+          "tier": "Regional"
+        },
+        "name": "[variables('winJmphostPublicIpName')]",
+        "apiVersion": "2019-11-01",
+        "location": "[parameters('location')]",
+        "properties": {
+          "publicIPAddressVersion": "IPv4",
+          "publicIPAllocationMethod": "Static",
+          "idleTimeoutInMinutes": 4,
+          "dnsSettings": {
+            "domainNameLabel": "[toLower(parameters('winVmDnsPrefix'))]"
+          }
+        }
+      },
+      {
         "comments": "Network Interface Card (NIC) for Win Jump-Host",
         "type": "Microsoft.Network/networkInterfaces",
         "name": "[variables('winVmNicName')]",
@@ -383,6 +412,229 @@
           "primary": true
         }
       },
+      ///////////////////////////////////////////////////////////
+      // StartRegion - dev host
+      ///////////////////////////////////////////////////////////
+      {
+        "comments": "Development Workload",
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[variables('winSpoke1hostName')]",
+        "apiVersion": "2019-12-01",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkInterfaces', variables('winSpoke1VmNicName'))]",
+          "[resourceId('Microsoft.Storage/storageAccounts', variables('winVmStorageName'))]"
+        ],
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "[parameters('winVmSize')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "MicrosoftWindowsServer",
+              "offer": "WindowsServer",
+              "sku": "[parameters('windowsOSVersion')]",
+              "version": "latest"
+            },
+            "osDisk": {
+              "createOption": "FromImage"
+            },
+            "dataDisks": [
+              {
+                "diskSizeGB": 20,
+                "lun": 0,
+                "createOption": "Empty"
+              }
+            ]
+          },
+          "osProfile": {
+            "computerName": "[variables('winSpoke1hostName')]",
+            "adminUsername": "[parameters('winVmUser')]",
+            "adminPassword": "[parameters('winVmPassword')]",
+            "windowsConfiguration": {
+              "provisionVMAgent": true
+            }
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('winSpoke1VmNicName'))]"
+              }
+            ]
+          },
+          "diagnosticsProfile": {
+            "bootDiagnostics": {
+              "enabled": true,
+              "storageUri": "[reference(variables('winVmStorageName'), '2019-06-01').primaryEndpoints['blob']]"
+            }
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2021-04-01",
+        "name": "[concat(variables('winSpoke1hostName'),'/', 'InstallWebServer')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/',variables('winSpoke1hostName'))]"
+        ],
+        "properties": {
+          "publisher": "Microsoft.Compute",
+          "type": "CustomScriptExtension",
+          "typeHandlerVersion": "1.7",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "fileUris": [
+              "https://raw.githubusercontent.com/Azure/azure-docs-json-samples/master/tutorial-vm-extension/installWebServer.ps1"
+            ],
+            "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File installWebServer.ps1"
+          }
+        }
+      },
+      {
+        "comments": "Network Interface Card (NIC) for Development Host",
+        "type": "Microsoft.Network/networkInterfaces",
+        "name": "[variables('winSpoke1VmNicName')]",
+        "apiVersion": "2019-11-01",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkSecurityGroups', variables('winNsgName'))]",
+          "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('devSpokeVnetName'), variables('spokeWorkloadSubnetName'))]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "winJmpHostIpConfig",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "subnet": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('devSpokeVnetName'), variables('spokeWorkloadSubnetName'))]"
+                },
+                "primary": true,
+                "privateIPAddressVersion": "IPv4"
+              }
+            }
+          ],
+          "enableAcceleratedNetworking": false,
+          "enableIPForwarding": false,
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('winNsgName'))]"
+          },
+          "primary": true
+        }
+      },
+      ///////////////////////////////////////////////////////////
+      // StartRegion - prod host
+      ///////////////////////////////////////////////////////////
+      {
+        "comments": "Production Workload",
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[variables('winSpoke2hostName')]",
+        "apiVersion": "2019-12-01",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkInterfaces', variables('winSpoke2VmNicName'))]",
+          "[resourceId('Microsoft.Storage/storageAccounts', variables('winVmStorageName'))]"
+        ],
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "[parameters('winVmSize')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "MicrosoftWindowsServer",
+              "offer": "WindowsServer",
+              "sku": "[parameters('windowsOSVersion')]",
+              "version": "latest"
+            },
+            "osDisk": {
+              "createOption": "FromImage"
+            },
+            "dataDisks": [
+              {
+                "diskSizeGB": 20,
+                "lun": 0,
+                "createOption": "Empty"
+              }
+            ]
+          },
+          "osProfile": {
+            "computerName": "[variables('winSpoke2hostName')]",
+            "adminUsername": "[parameters('winVmUser')]",
+            "adminPassword": "[parameters('winVmPassword')]",
+            "windowsConfiguration": {
+              "provisionVMAgent": true
+            }
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('winSpoke2VmNicName'))]"
+              }
+            ]
+          },
+          "diagnosticsProfile": {
+            "bootDiagnostics": {
+              "enabled": true,
+              "storageUri": "[reference(variables('winVmStorageName'), '2019-06-01').primaryEndpoints['blob']]"
+            }
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2021-04-01",
+        "name": "[concat(variables('winSpoke2hostName'),'/', 'InstallWebServer')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/',variables('winSpoke2hostName'))]"
+        ],
+        "properties": {
+          "publisher": "Microsoft.Compute",
+          "type": "CustomScriptExtension",
+          "typeHandlerVersion": "1.7",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "fileUris": [
+              "https://raw.githubusercontent.com/Azure/azure-docs-json-samples/master/tutorial-vm-extension/installWebServer.ps1"
+            ],
+            "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File installWebServer.ps1"
+          }
+        }
+      },
+      {
+        "comments": "Network Interface Card (NIC) for Win Prod Host",
+        "type": "Microsoft.Network/networkInterfaces",
+        "name": "[variables('winSpoke2VmNicName')]",
+        "apiVersion": "2019-11-01",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkSecurityGroups', variables('winNsgName'))]",
+          "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('prodSpokeVnetName'), variables('spokeWorkloadSubnetName'))]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "winJmpHostIpConfig",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "subnet": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('prodSpokeVnetName'), variables('spokeWorkloadSubnetName'))]"
+                },
+                "primary": true,
+                "privateIPAddressVersion": "IPv4"
+              }
+            }
+          ],
+          "enableAcceleratedNetworking": false,
+          "enableIPForwarding": false,
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('winNsgName'))]"
+          },
+          "primary": true
+        }
+      },
+      ///////////////////////////////////////////////////////////  
       {
         "comments": "NSG For Windows Jump Host",
         "type": "Microsoft.Network/networkSecurityGroups",
@@ -402,6 +654,20 @@
                 "destinationAddressPrefix": "*",
                 "access": "Allow",
                 "priority": 1000,
+                "direction": "Inbound"
+              }
+            },
+            {
+              "name": "AllowHTTPInbound",
+              "properties": {
+                "description": "Allow inbound RDP",
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "destinationPortRange": "80",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 900,
                 "direction": "Inbound"
               }
             }
@@ -492,25 +758,6 @@
               }
             }
           ]
-        }
-      },
-      {
-        "comments": "Public IP (PIP) for Windows JumpHost",
-        "type": "Microsoft.Network/publicIPAddresses",
-        "sku": {
-          "name": "Basic",
-          "tier": "Regional"
-        },
-        "name": "[variables('winJmphostPublicIpName')]",
-        "apiVersion": "2019-11-01",
-        "location": "[parameters('location')]",
-        "properties": {
-          "publicIPAddressVersion": "IPv4",
-          "publicIPAllocationMethod": "Static",
-          "idleTimeoutInMinutes": 4,
-          "dnsSettings": {
-            "domainNameLabel": "[toLower(parameters('winVmDnsPrefix'))]"
-          }
         }
       },
       {

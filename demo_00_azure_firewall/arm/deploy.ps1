@@ -9,13 +9,16 @@
 # $subChoice = $Subscriptions | out-gridview -Title "Select One or More Subscriptions" -PassThru
 # Set-AzContext $subChoice.Id
 
-# # create new resource group
-# $rg = (New-AzResourceGroup -Name 'hubspoke-rg' -Location 'northeurope').ResourceGroupName
+# create new resource group if not exists
+$rg = Get-AzResourceGroup -name 'huspoke-rg' -ErrorAction SilentlyContinue
+if(!$rg) {
+    $rg = New-AzResourceGroup -Name 'huspoke-rg' -Location 'northeurope'
+}
 
 # Deploy resource
 New-AzResourceGroupDeployment `
     -Name 'deploy01' `
-    -ResourceGroupName 'hubspoke-rg' `
+    -ResourceGroupName $rg.ResourceGroupName `
     -TemplateFile $PSScriptRoot\azuredeploy.json `
     -TemplateParameterFile $PSScriptRoot\azuredeploy.parameters.json
 
