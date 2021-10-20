@@ -327,6 +327,27 @@
         }
       },
       {
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2021-04-01",
+        "name": "[concat(variables('winJmphostName'),'/', 'InstallWebServer')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/',variables('winJmphostName'))]"
+        ],
+        "properties": {
+          "publisher": "Microsoft.Compute",
+          "type": "CustomScriptExtension",
+          "typeHandlerVersion": "1.7",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "fileUris": [
+              "https://raw.githubusercontent.com/Azure/azure-docs-json-samples/master/tutorial-vm-extension/installWebServer.ps1"
+            ],
+            "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File installWebServer.ps1"
+          }
+        }
+      },
+      {
         "comments": "Network Interface Card (NIC) for Win Jump-Host",
         "type": "Microsoft.Network/networkInterfaces",
         "name": "[variables('winVmNicName')]",
