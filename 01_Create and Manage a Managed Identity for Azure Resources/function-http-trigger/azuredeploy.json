@@ -47,7 +47,7 @@
 
   },
   "variables": {
-    "appNameSuffixRandom": "[uniqueString(parameters('appNameSuffix'), parameters('utcTime'))]",
+    "appNameSuffixRandom": "[uniqueString(parameters('utcTime'), parameters('appNameSuffix'))]",
     "functionAppName": "[format('fn-{0}', variables('appNameSuffixRandom'))]",
     "appServicePlanName": "FunctionPlan",
     "appInsightsName": "AppInsights",
