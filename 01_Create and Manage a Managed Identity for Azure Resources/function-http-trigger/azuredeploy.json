@@ -47,14 +47,14 @@
 
   },
   "variables": {
-    "appNameSuffixRandom": "[uniqueString(parameters('utcTime'), parameters('appNameSuffix'))]",
+    "appNameSuffixRandom": "[guid(parameters('utcTime'), parameters('appNameSuffix'))]",
     "functionAppName": "[format('fn-{0}', variables('appNameSuffixRandom'))]",
     "appServicePlanName": "FunctionPlan",
     "appInsightsName": "AppInsights",
-    "storageAccountName": "[format('fnstor{0}', replace(variables('appNameSuffixRandom'), '-', ''))]",
+    "storageAccountName": "[substring(format('fnstor{0}', replace(variables('appNameSuffixRandom'), '-', '')),0, 24)]",
     "functionNameComputed": "MyHttpTriggeredFunction",
     "functionRuntime": "dotnet",
-    "keyVaultName": "[format('kv{0}', replace(variables('appNameSuffixRandom'), '-', ''))]",
+    "keyVaultName": "[substring(format('kv{0}', replace(variables('appNameSuffixRandom'), '-', '')), 0, 24)]",
     "functionAppKeySecretName": "FunctionAppHostKey"
   },
   "resources": [
