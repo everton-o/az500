@@ -39,7 +39,7 @@
     },
     "utcTime": {
       "type": "string",
-      "defaultValue": "[utcNow('yyyyMMddTHHmmss')]",
+      "defaultValue": "[newGuid()]",
       "metadata": {
         "description": "Used as part of the ExecuteCommand extension"
       }
