@@ -36,16 +36,25 @@
       "metadata": {
         "description": "Storage account SKU name."
       }
+    },
+    "utcTime": {
+      "type": "string",
+      "defaultValue": "[utcNow('yyyyMMddTHHmmss')]",
+      "metadata": {
+        "description": "Used as part of the ExecuteCommand extension"
+      }
     }
+
   },
   "variables": {
-    "functionAppName": "[format('fn-{0}', parameters('appNameSuffix'))]",
+    "appNameSuffixRandom": "[uniqueString(parameters('appNameSuffix'), parameters('utcTime'))]",
+    "functionAppName": "[format('fn-{0}', variables('appNameSuffixRandom'))]",
     "appServicePlanName": "FunctionPlan",
     "appInsightsName": "AppInsights",
-    "storageAccountName": "[format('fnstor{0}', replace(parameters('appNameSuffix'), '-', ''))]",
+    "storageAccountName": "[format('fnstor{0}', replace(variables('appNameSuffixRandom'), '-', ''))]",
     "functionNameComputed": "MyHttpTriggeredFunction",
     "functionRuntime": "dotnet",
-    "keyVaultName": "[format('kv{0}', replace(parameters('appNameSuffix'), '-', ''))]",
+    "keyVaultName": "[format('kv{0}', replace(variables('appNameSuffixRandom'), '-', ''))]",
     "functionAppKeySecretName": "FunctionAppHostKey"
   },
   "resources": [
