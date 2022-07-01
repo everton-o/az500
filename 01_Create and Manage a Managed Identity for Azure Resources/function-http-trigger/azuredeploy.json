@@ -48,7 +48,7 @@
   },
   "variables": {
     "appNameSuffixRandom": "[guid(parameters('utcTime'), parameters('appNameSuffix'))]",
-    "functionAppName": "[format('fn-{0}', variables('appNameSuffixRandom'))]",
+    "functionAppName": "[substring(format('fn-{0}', replace(variables('appNameSuffixRandom'), '-', '')), 0 ,24)]",
     "appServicePlanName": "FunctionPlan",
     "appInsightsName": "AppInsights",
     "storageAccountName": "[substring(format('fnstor{0}', replace(variables('appNameSuffixRandom'), '-', '')),0, 24)]",
