@@ -37,11 +37,11 @@
         "description": "Storage account SKU name."
       }
     },
-    "utcTime": {
+    "uniqueString": {
       "type": "string",
       "defaultValue": "[newGuid()]",
       "metadata": {
-        "description": "Used as part of the ExecuteCommand extension"
+        "description": "Used to give the services a unique name"
       }
     }
 
