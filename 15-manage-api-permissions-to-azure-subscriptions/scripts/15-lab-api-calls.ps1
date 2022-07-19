@@ -16,10 +16,10 @@
 # LOGIN AS A SERVICE PRINCIPAL
 #**********************
 
-$TenantId = '40c5fbc4-e069-4526-9412-1d0cb5de4b0f'
-$subscriptionId = '04e9d0e4-fbbc-4cf7-b59d-21ddd9a1fa30'
-$ApplicationId = 'e48731a1-19a7-4cce-8bfe-6a7dbfc0f397'
-$SecuredPassword = ConvertTo-SecureString -String '9FC8Q~V1BdnG1jsC9yTqb42C0BpWAQ1NCqrCsbJo' -AsPlainText -force
+$TenantId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+$subscriptionId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+$ApplicationId = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+$SecuredPassword = ConvertTo-SecureString -String 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' -AsPlainText -force
 
 $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $ApplicationId, $SecuredPassword
 Connect-AzAccount -ServicePrincipal -TenantId $TenantId -Credential $Credential -Subscription $subscriptionId
