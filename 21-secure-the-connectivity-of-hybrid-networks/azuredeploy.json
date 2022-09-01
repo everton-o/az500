@@ -11,9 +11,9 @@
   "parameters": {
     "vnetName": {
       "type": "string",
-      "defaultValue": "VNet1",
+      "defaultValue": "vnet-gateway-lab-01",
       "metadata": {
-        "description": "vnet-gateway-lab"
+        "description": "deploy virtual network"
       }
     },
     "vnetAddressPrefix": {
