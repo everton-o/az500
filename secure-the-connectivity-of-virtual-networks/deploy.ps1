@@ -1,9 +1,9 @@
 # Connect-AzAccount
 
 New-AzResourceGroupDeployment `
-    -Name 'fnapp_deploy' `
+    -Name 'vm-deploy' `
     -ResourceGroupName 'az500' `
-    -TemplateFile .\azureploy.bicep
+    -TemplateFile .\azuredeploy.bicep
 
 
 
