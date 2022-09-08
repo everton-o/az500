@@ -1,4 +1,4 @@
-# Azure Virtual Network, Subnet, and VMs
+# Azure Virtual Network, Subnets, and VM
 
 
 This example deploys a Azure Virtual Network, Subnet and one VM without a Public IP associated with it
