@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.9.1.41621",
-      "templateHash": "6965816266613278247"
+      "templateHash": "8842474144835799796"
     }
   },
   "parameters": {
@@ -37,20 +37,6 @@
         "description": "subnet address prefix"
       }
     },
-    "subnetName2": {
-      "type": "string",
-      "defaultValue": "web-subnet-10.0.2.0-24",
-      "metadata": {
-        "description": "subnet name 2"
-      }
-    },
-    "subnetAddressPrefix2": {
-      "type": "string",
-      "defaultValue": "10.0.2.0/24",
-      "metadata": {
-        "description": "subnet address prefix 2"
-      }
-    },
     "adminUsername": {
       "type": "secureString",
       "defaultValue": "xxxxxxx",
@@ -60,11 +46,14 @@
     },
     "adminPassword": {
       "type": "secureString",
-      "defaultValue": "xxxxxxx",
+      "defaultValue": "xxxxxxxxxxxxxxxxxxx",
       "metadata": {
         "description": "password to access the VMs"
       }
     }
+  },
+  "variables": {
+    "resourceCount": 1
   },
   "resources": [
     {
@@ -86,12 +75,6 @@
             }
           },
           {
-            "name": "[parameters('subnetName2')]",
-            "properties": {
-              "addressPrefix": "[parameters('subnetAddressPrefix2')]"
-            }
-          },
-          {
             "name": "AzureFirewallSubnet",
             "properties": {
               "addressPrefix": "10.0.0.0/26"
@@ -102,59 +85,38 @@
     },
     {
       "copy": {
-        "name": "publicIp",
-        "count": "[length(range(0, 2))]"
-      },
-      "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2022-01-01",
-      "name": "[format('public_ip_0{0}', range(0, 2)[copyIndex()])]",
-      "location": "[resourceGroup().location]",
-      "sku": {
-        "name": "Basic",
-        "tier": "Regional"
-      },
-      "properties": {
-        "publicIPAllocationMethod": "Dynamic"
-      }
-    },
-    {
-      "copy": {
         "name": "networkCard",
-        "count": "[length(range(0, 2))]"
+        "count": "[length(range(0, variables('resourceCount')))]"
       },
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2021-02-01",
-      "name": "[if(equals(range(0, 2)[copyIndex()], 0), format('nic-data-{0}', range(0, 2)[copyIndex()]), format('nic-web-{0}', range(0, 2)[copyIndex()]))]",
+      "name": "[format('nic-data-{0}', range(0, variables('resourceCount'))[copyIndex()])]",
       "location": "[resourceGroup().location]",
       "properties": {
         "ipConfigurations": [
           {
             "name": "ipConfig1",
             "properties": {
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', format('public_ip_0{0}', range(0, 2)[copyIndex()]))]"
-              },
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
-                "id": "[reference(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))).subnets[range(0, 2)[copyIndex()]].id]"
+                "id": "[reference(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))).subnets[0].id]"
               }
             }
           }
         ]
       },
       "dependsOn": [
-        "publicIp",
         "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
       ]
     },
     {
       "copy": {
         "name": "windowsVM",
-        "count": "[length(range(0, 2))]"
+        "count": "[length(range(0, variables('resourceCount')))]"
       },
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2020-12-01",
-      "name": "[if(equals(range(0, 2)[copyIndex()], 0), format('vm-data{0}-{1}', range(0, 2)[copyIndex()], substring(uniqueString(resourceGroup().id), 0, 5)), format('vm-web{0}-{1}', range(0, 2)[copyIndex()], substring(uniqueString(resourceGroup().id), 0, 5)))]",
+      "name": "[format('vm-data{0}-{1}', range(0, variables('resourceCount'))[copyIndex()], substring(uniqueString(resourceGroup().id), 0, 5))]",
       "location": "[resourceGroup().location]",
       "identity": {
         "type": "SystemAssigned"
@@ -164,7 +126,7 @@
           "vmSize": "Standard_B2s"
         },
         "osProfile": {
-          "computerName": "[if(equals(range(0, 2)[copyIndex()], 0), format('win-0{0}-data', range(0, 2)[copyIndex()]), format('win-0{0}-web', range(0, 2)[copyIndex()]))]",
+          "computerName": "[format('win-0{0}-data', range(0, variables('resourceCount'))[copyIndex()])]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]",
           "allowExtensionOperations": true,
@@ -182,7 +144,7 @@
             "version": "latest"
           },
           "osDisk": {
-            "name": "[toLower(format('osdisk-{0}vm{1}', range(0, 2)[copyIndex()], substring(uniqueString(resourceGroup().id), 0, 10)))]",
+            "name": "[toLower(format('osdisk-{0}vm{1}', range(0, variables('resourceCount'))[copyIndex()], substring(uniqueString(resourceGroup().id), 0, 10)))]",
             "caching": "ReadWrite",
             "createOption": "FromImage"
           }
@@ -190,7 +152,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', if(equals(range(0, 2)[range(0, 2)[copyIndex()]], 0), format('nic-data-{0}', range(0, 2)[range(0, 2)[copyIndex()]]), format('nic-web-{0}', range(0, 2)[range(0, 2)[copyIndex()]])))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', format('nic-data-{0}', range(0, variables('resourceCount'))[range(0, variables('resourceCount'))[copyIndex()]]))]"
             }
           ]
         },
@@ -201,7 +163,7 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', if(equals(range(0, 2)[range(0, 2)[copyIndex()]], 0), format('nic-data-{0}', range(0, 2)[range(0, 2)[copyIndex()]]), format('nic-web-{0}', range(0, 2)[range(0, 2)[copyIndex()]])))]"
+        "[resourceId('Microsoft.Network/networkInterfaces', format('nic-data-{0}', range(0, variables('resourceCount'))[range(0, variables('resourceCount'))[copyIndex()]]))]"
       ]
     }
   ]

@@ -12,20 +12,16 @@ param subnetName1 string = 'data-subnet-10.0.1.0-24'
 @description('subnet address prefix')
 param subnetAddressPrefix1 string = '10.0.1.0/24'
 
-@description('subnet name 2')
-param subnetName2 string = 'web-subnet-10.0.2.0-24'
-
-@description('subnet address prefix 2')
-param subnetAddressPrefix2 string = '10.0.2.0/24'
-
 @description('user to access the VMs')
 @secure()
 param adminUsername string = 'xxxxxxx'
 
 @description('password to access the VMs')
 @secure()
-param adminPassword string = 'xxxxxxx'
+param adminPassword string = 'xxxxxxxxxxxxxxxxxxx'
 
+
+var resourceCount = 1
 
 
 resource vnet 'Microsoft.Network/virtualNetworks@2022-01-01' = {
@@ -45,12 +41,6 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-01-01' = {
         }
       }
       {
-        name: subnetName2
-        properties: {
-          addressPrefix: subnetAddressPrefix2
-        }
-      }
-      {
         name: 'AzureFirewallSubnet'
         properties: {
           addressPrefix: '10.0.0.0/26'
@@ -61,50 +51,29 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-01-01' = {
 }
 
 
-// deploy public ip 01
-resource publicIp 'Microsoft.Network/publicIPAddresses@2022-01-01' = [for i in range(0, 2): {
-  name: 'public_ip_0${i}'
-  location: resourceGroup().location
-  sku: {
-    name: 'Basic'
-    tier: 'Regional'
-  }
-  properties: {
-    publicIPAllocationMethod: 'Dynamic'
-  }
-}]
-
-
 // Deploy Network Interface Card
-resource networkCard 'Microsoft.Network/networkInterfaces@2021-02-01' = [for i in range(0, 2):  {
-  name: i == 0 ? 'nic-data-${i}' : 'nic-web-${i}' 
+resource networkCard 'Microsoft.Network/networkInterfaces@2021-02-01' = [for i in range(0, resourceCount):  {
+  name: 'nic-data-${i}'
   location: resourceGroup().location
   properties: {
     ipConfigurations: [
       {
         name: 'ipConfig1'
         properties: {
-          publicIPAddress: {
-            id: resourceId('Microsoft.Network/publicIPAddresses', 'public_ip_0${i}')
-          }
           privateIPAllocationMethod: 'Dynamic'
           subnet: {
-            id: vnet.properties.subnets[i].id
+            id: vnet.properties.subnets[0].id
           }
         }
       }
     ]
   }
-  dependsOn: [
-    publicIp
-  ]
 }]
 
 
-
 // Deploy Windows VM
-resource windowsVM 'Microsoft.Compute/virtualMachines@2020-12-01' = [for i in range(0, 2): {
-  name: i == 0 ? 'vm-data${i}-${substring(uniqueString(resourceGroup().id),0,5)}' : 'vm-web${i}-${substring(uniqueString(resourceGroup().id),0,5)}'
+resource windowsVM 'Microsoft.Compute/virtualMachines@2020-12-01' = [for i in range(0, resourceCount): {
+  name: 'vm-data${i}-${substring(uniqueString(resourceGroup().id),0,5)}'
   location: resourceGroup().location
   identity: {
     type: 'SystemAssigned'
@@ -114,7 +83,7 @@ resource windowsVM 'Microsoft.Compute/virtualMachines@2020-12-01' = [for i in ra
       vmSize: 'Standard_B2s'
     }
     osProfile: {
-      computerName: i == 0 ? 'win-0${i}-data' : 'win-0${i}-web'
+      computerName: 'win-0${i}-data'
       adminUsername: adminUsername
       adminPassword: adminPassword
       allowExtensionOperations: true
