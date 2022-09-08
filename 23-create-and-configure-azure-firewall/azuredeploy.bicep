@@ -7,16 +7,16 @@ param vnetName string = 'vnet-001'
 param vnetAddressPrefix string = '10.0.0.0/16'
 
 @description('subnet name')
-param subnetName1 string = 'data-subnet-10.0.0.0-24'
+param subnetName1 string = 'data-subnet-10.0.1.0-24'
 
 @description('subnet address prefix')
-param subnetAddressPrefix1 string = '10.0.0.0/24'
+param subnetAddressPrefix1 string = '10.0.1.0/24'
 
 @description('subnet name 2')
-param subnetName2 string = 'web-subnet-10.0.1.0-24'
+param subnetName2 string = 'web-subnet-10.0.2.0-24'
 
 @description('subnet address prefix 2')
-param subnetAddressPrefix2 string = '10.0.1.0/24'
+param subnetAddressPrefix2 string = '10.0.2.0/24'
 
 @description('user to access the VMs')
 @secure()
@@ -48,6 +48,12 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-01-01' = {
         name: subnetName2
         properties: {
           addressPrefix: subnetAddressPrefix2
+        }
+      }
+      {
+        name: 'AzureFirewallSubnet'
+        properties: {
+          addressPrefix: '10.0.0.0/27'
         }
       }
     ]

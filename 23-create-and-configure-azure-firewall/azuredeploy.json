@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.9.1.41621",
-      "templateHash": "506889575533699596"
+      "templateHash": "6317108586236198265"
     }
   },
   "parameters": {
@@ -25,28 +25,28 @@
     },
     "subnetName1": {
       "type": "string",
-      "defaultValue": "data-subnet-10.0.0.0-24",
+      "defaultValue": "data-subnet-10.0.1.0-24",
       "metadata": {
         "description": "subnet name"
       }
     },
     "subnetAddressPrefix1": {
       "type": "string",
-      "defaultValue": "10.0.0.0/24",
+      "defaultValue": "10.0.1.0/24",
       "metadata": {
         "description": "subnet address prefix"
       }
     },
     "subnetName2": {
       "type": "string",
-      "defaultValue": "web-subnet-10.0.1.0-24",
+      "defaultValue": "web-subnet-10.0.2.0-24",
       "metadata": {
         "description": "subnet name 2"
       }
     },
     "subnetAddressPrefix2": {
       "type": "string",
-      "defaultValue": "10.0.1.0/24",
+      "defaultValue": "10.0.2.0/24",
       "metadata": {
         "description": "subnet address prefix 2"
       }
@@ -89,6 +89,12 @@
             "name": "[parameters('subnetName2')]",
             "properties": {
               "addressPrefix": "[parameters('subnetAddressPrefix2')]"
+            }
+          },
+          {
+            "name": "AzureFirewallSubnet",
+            "properties": {
+              "addressPrefix": "10.0.0.0/27"
             }
           }
         ]
