@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.10.13.619",
-      "templateHash": "8234624495326801247"
+      "templateHash": "9257398547684331133"
     }
   },
   "parameters": {
@@ -158,7 +158,12 @@
         "networkSecurityGroup": {
           "id": "[resourceId('Microsoft.Network/networkSecurityGroups', format('{0}{1}', variables('nsgName'), add(range(0, 2)[range(0, length(range(0, 2)))[copyIndex()]], 1)))]"
         }
-      }
+      },
+      "dependsOn": [
+        "networkSecurityGroup",
+        "publicIPAddress",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName_var'))]"
+      ]
     },
     {
       "copy": {
@@ -207,7 +212,10 @@
             }
           ]
         }
-      }
+      },
+      "dependsOn": [
+        "networkCard"
+      ]
     },
     {
       "copy": {

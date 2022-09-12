@@ -120,6 +120,11 @@ resource networkCard 'Microsoft.Network/networkInterfaces@2021-02-01' = [for i i
         id: resourceId('Microsoft.Network/networkSecurityGroups', '${nsgName}${(range(0, 2)[i] + 1)}')
     }
   }
+  dependsOn: [
+    vnet
+    publicIPAddress
+    networkSecurityGroup
+  ]
 }]
 
 
@@ -165,6 +170,9 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-11-01' = [for i in range(0, 
       ]
     }
   }
+  dependsOn: [
+    networkCard
+  ]
 }]
 
 
