@@ -1,7 +1,7 @@
-# Azure Virtual Network, Subnets, and VM
+# Azure Virtual Network, Subnets, and two VMs
 
 
-This example deploys a Azure Virtual Network, Subnet and one VM without a Public IP associated with it
+This example deploys a Azure Virtual Network, Subnet and two VMs with Public IP associated with them
 
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Feverton-o%2Faz500%2Fmain%2F25-create-and-configure-application-gateway%2Fazuredeploy.json)
