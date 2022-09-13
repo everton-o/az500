@@ -1,7 +1,7 @@
-# Azure Virtual Network, Subnets, and two VMs
+# Azure Virtual Network, Subnets, Application Gateway and two VMs as backend pool, 
 
 
-This example deploys a Azure Virtual Network, Subnet and two VMs with Public IP associated with them
+This example deploys a Azure Virtual Network, Subnet, Application Gatway and two VMs used as a backend pool for the App Gateway
 
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Feverton-o%2Faz500%2Fmain%2F26-configure-and-create-azure-front-door%2Fazuredeploy.json)
