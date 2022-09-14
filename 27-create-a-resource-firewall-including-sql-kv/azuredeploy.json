@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.10.61.36676",
-      "templateHash": "10585573106295239705"
+      "templateHash": "13715596613096557782"
     }
   },
   "parameters": {
@@ -34,10 +34,17 @@
       "metadata": {
         "description": "The administrator password of the SQL logical server."
       }
+    },
+    "uniqueValue": {
+      "type": "string",
+      "defaultValue": "[newGuid()]",
+      "metadata": {
+        "description": "Random value to generate unique name to services"
+      }
     }
   },
   "variables": {
-    "appNameSuffix": "[uniqueString(resourceGroup().id)]",
+    "appNameSuffix": "[uniqueString(parameters('uniqueValue'), resourceGroup().id)]",
     "functionAppName": "[format('fn-{0}', variables('appNameSuffix'))]",
     "appServicePlanName": "FunctionPlan",
     "storageAccountName": "[format('st{0}', replace(variables('appNameSuffix'), '-', ''))]",

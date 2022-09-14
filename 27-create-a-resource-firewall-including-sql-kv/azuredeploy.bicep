@@ -12,8 +12,10 @@ param administratorLogin string
 @secure()
 param administratorLoginPassword string
 
+@description('Random value to generate unique name to services')
+param uniqueValue string = newGuid()
 
-var appNameSuffix = uniqueString(resourceGroup().id)
+var appNameSuffix = uniqueString(uniqueValue,resourceGroup().id)
 var functionAppName = 'fn-${appNameSuffix}'
 var appServicePlanName = 'FunctionPlan'
 var storageAccountName = 'st${replace(appNameSuffix, '-', '')}'
