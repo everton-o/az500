@@ -1,3 +1,8 @@
+<#
+    Author: Everton Oliveira
+    Description: Install Chocolatey and Azure Storage Explorer
+#>
+
 
 # install chocolatey if not exists
 if(-not((Get-Command choco -ErrorAction SilentlyContinue))){
