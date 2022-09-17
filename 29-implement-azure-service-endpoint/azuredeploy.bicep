@@ -19,16 +19,48 @@ param subnetName2 string = 'web-subnet-10.0.1.0-24'
 param subnetAddressPrefix2 string = '10.0.1.0/24'
 
 @description('user to access the VMs')
-@secure()
-param adminUsername string = 'xxxxxxx'
+param adminUsername string
 
 @description('password to access the VMs')
 @secure()
-param adminPassword string = 'xxxxxxx'
-
+param adminPassword string
 
 var location = resourceGroup().location
 
+
+
+// deploy log analytics 
+resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' = {
+  name: uniqueString('loganalytics', resourceGroup().id)
+  location: location
+}
+
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = [for i in range(0, 2): {
+  name: uniqueString('storage0${i}', resourceGroup().id)
+  location: location
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'StorageV2'
+  properties: {
+    supportsHttpsTrafficOnly: true
+    encryption: {
+      services: {
+        file: {
+          keyType: 'Account'
+          enabled: true
+        }
+        blob: {
+          keyType: 'Account'
+          enabled: true
+        }
+      }
+      keySource: 'Microsoft.Storage'
+    }
+    accessTier: 'Hot'
+  }
+}]
 
 
 resource vnet 'Microsoft.Network/virtualNetworks@2022-01-01' = {
@@ -99,6 +131,7 @@ resource networkCard 'Microsoft.Network/networkInterfaces@2021-02-01' = [for i i
 
 
 
+
 // Deploy Windows VM
 resource windowsVM 'Microsoft.Compute/virtualMachines@2020-12-01' = [for i in range(0, 2): {
   name: i == 0 ? 'vm-data${i}-${substring(uniqueString(resourceGroup().id),0,5)}' : 'vm-web${i}-${substring(uniqueString(resourceGroup().id),0,5)}'
@@ -152,7 +185,7 @@ resource windowsVM 'Microsoft.Compute/virtualMachines@2020-12-01' = [for i in ra
 
 // Install softwares required for VM to work as a custom DevOps agent
 resource CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2020-12-01' = [for i in range(0, 2): {
-  name: '${windowsVM[i]}/CustomScriptExtension'
+  name: '${windowsVM[i].name}/CustomScriptExtension'
   location: location
   dependsOn: [
     windowsVM
@@ -163,10 +196,10 @@ resource CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@202
     typeHandlerVersion: '1.10'
     autoUpgradeMinorVersion: true                            
     protectedSettings: { 
-      commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File .\\tools\\install-azurestorageexplorer.ps1'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File .\\install-azurestorageexplorer.ps1'
         fileUris: [
-        '${storageUri}scripts/dns-servers/SetupAgent.ps1'                 
+        'https://raw.githubusercontent.com/everton-o/az500/main/29-implement-azure-service-endpoint/tools/install-azurestorageexplorer.ps1'                 
       ]
     }           
   }
-}
+}]
