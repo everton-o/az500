@@ -1,0 +1,251 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.10.61.36676",
+      "templateHash": "11361410141759052971"
+    }
+  },
+  "parameters": {
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "vnet-001",
+      "metadata": {
+        "description": "Name of the virtual network"
+      }
+    },
+    "vnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/16",
+      "metadata": {
+        "description": "VNet Address prefix"
+      }
+    },
+    "subnetName1": {
+      "type": "string",
+      "defaultValue": "dns-subnet-10.0.0.0-24",
+      "metadata": {
+        "description": "subnet name"
+      }
+    },
+    "subnetAddressPrefix1": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/24",
+      "metadata": {
+        "description": "subnet address prefix"
+      }
+    },
+    "subnetName2": {
+      "type": "string",
+      "defaultValue": "data-subnet-10.0.1.0-24",
+      "metadata": {
+        "description": "subnet name 2"
+      }
+    },
+    "subnetAddressPrefix2": {
+      "type": "string",
+      "defaultValue": "10.0.1.0/24",
+      "metadata": {
+        "description": "subnet address prefix 2"
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "user to access the VMs"
+      }
+    },
+    "adminPassword": {
+      "type": "secureString",
+      "metadata": {
+        "description": "password to access the VMs"
+      }
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-04-01",
+      "name": "[uniqueString('storage', resourceGroup().id)]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "supportsHttpsTrafficOnly": true,
+        "encryption": {
+          "services": {
+            "file": {
+              "keyType": "Account",
+              "enabled": true
+            },
+            "blob": {
+              "keyType": "Account",
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        },
+        "accessTier": "Hot"
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2022-01-01",
+      "name": "[parameters('vnetName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnetAddressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('subnetName1')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetAddressPrefix1')]"
+            }
+          },
+          {
+            "name": "[parameters('subnetName2')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetAddressPrefix2')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "copy": {
+        "name": "publicIp",
+        "count": "[length(range(0, 2))]"
+      },
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2022-01-01",
+      "name": "[format('public_ip_0{0}', range(0, 2)[copyIndex()])]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "Basic",
+        "tier": "Regional"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    },
+    {
+      "copy": {
+        "name": "networkCard",
+        "count": "[length(range(0, 2))]"
+      },
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2021-02-01",
+      "name": "[if(equals(range(0, 2)[copyIndex()], 0), 'dns-nic', 'data-nic')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipConfig1",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', format('public_ip_0{0}', range(0, 2)[copyIndex()]))]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[reference(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))).subnets[range(0, 2)[copyIndex()]].id]"
+              }
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "publicIp",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "windowsVM",
+        "count": "[length(range(0, 2))]"
+      },
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2020-12-01",
+      "name": "[if(equals(range(0, 2)[copyIndex()], 0), 'dns-win22', 'data-win22')]",
+      "location": "[variables('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_B2s"
+        },
+        "osProfile": {
+          "computerName": "[if(equals(range(0, 2)[copyIndex()], 0), 'dns-win22', 'data-win22')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]",
+          "allowExtensionOperations": true,
+          "windowsConfiguration": {
+            "provisionVMAgent": true,
+            "enableAutomaticUpdates": false,
+            "patchSettings": {}
+          }
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2022-datacenter-azure-edition",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[toLower(format('osdisk-{0}vm{1}', range(0, 2)[copyIndex()], substring(uniqueString(resourceGroup().id), 0, 10)))]",
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', if(equals(range(0, 2)[range(0, 2)[copyIndex()]], 0), 'dns-nic', 'data-nic'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": false
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', if(equals(range(0, 2)[range(0, 2)[copyIndex()]], 0), 'dns-nic', 'data-nic'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2020-12-01",
+      "name": "dns-win22/CustomScriptExtension",
+      "location": "[variables('location')]",
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.10",
+        "autoUpgradeMinorVersion": true,
+        "protectedSettings": {
+          "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File .\\install-dns.ps1",
+          "fileUris": [
+            "https://raw.githubusercontent.com/everton-o/az500/main/30-implement-azure-private-endpoints/tools/install-dns.ps1"
+          ]
+        }
+      },
+      "dependsOn": [
+        "windowsVM"
+      ]
+    }
+  ]
+}
