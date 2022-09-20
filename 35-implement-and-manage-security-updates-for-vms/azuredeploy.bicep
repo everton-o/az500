@@ -35,6 +35,22 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-12-01-previ
 resource automationAccount 'Microsoft.Automation/automationAccounts@2021-06-22' = {
   name: uniqueString('automation', resourceGroup().id)
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    disableLocalAuth: false
+    encryption: {
+      identity: {}
+      keySource: 'Microsoft.Automation'
+    }
+    publicNetworkAccess: false
+    sku: {
+      capacity: null
+      family: null
+      name: 'Basic' 
+    }
+  }
 }
 
 
