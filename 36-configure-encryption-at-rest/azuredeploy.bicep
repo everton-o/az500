@@ -13,7 +13,7 @@ param adminUsername string
 param adminPassword string
 
 @description('Key vault name, must be unique')
-param kvName string = uniqueString('kv1',resourceGroup().id)
+param kvName string
 
 /////////////////////
 // variable section

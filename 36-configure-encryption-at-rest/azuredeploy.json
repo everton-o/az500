@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.10.61.36676",
-      "templateHash": "7796761152675967465"
+      "templateHash": "16502197335241449269"
     }
   },
   "parameters": {
@@ -23,7 +23,6 @@
     },
     "kvName": {
       "type": "string",
-      "defaultValue": "[uniqueString('kv1', resourceGroup().id)]",
       "metadata": {
         "description": "Key vault name, must be unique"
       }
