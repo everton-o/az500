@@ -4,6 +4,7 @@
 // param section
 /////////////////////
 
+
 @description('user to access the VMs')
 param adminUsername string
 
@@ -11,6 +12,8 @@ param adminUsername string
 @secure()
 param adminPassword string
 
+@description('Key vault name, must be unique')
+param kvName string = uniqueString('kv1',resourceGroup().id)
 
 /////////////////////
 // variable section
@@ -21,7 +24,7 @@ var vnetAddressPrefix = '10.0.0.0/16'
 var subnetName1 = 'data-subnet-10.0.1.0-24'
 var subnetAddressPrefix1 = '10.0.1.0/24'
 var location = resourceGroup().location
-var resourceCount = 1
+var resourceCount = 2
 
 
 /////////////////////
@@ -31,7 +34,7 @@ var resourceCount = 1
 
 // deploy key vault
 resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
-  name: uniqueString('kv',resourceGroup().id)
+  name: kvName
   location: location
   properties: {
     tenantId: subscription().tenantId
@@ -59,12 +62,6 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-01-01' = {
         name: subnetName1
         properties: {
           addressPrefix: subnetAddressPrefix1
-        }
-      }
-      {
-        name: 'AzureFirewallSubnet'
-        properties: {
-          addressPrefix: '10.0.0.0/26'
         }
       }
     ]
@@ -100,7 +97,7 @@ resource networkCard 'Microsoft.Network/networkInterfaces@2021-02-01' = [for i i
           }
           privateIPAllocationMethod: 'Dynamic'
           subnet: {
-            id: vnet.properties.subnets[i].id
+            id: vnet.properties.subnets[0].id
           }
         }
       }

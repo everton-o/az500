@@ -1,6 +1,6 @@
 # Azure Virtual Network, Subnet, VM, Key Vault
 
-This example deploys a Azure Virtual Network, Subnet, one VM with a Public IPs associated with it, and Key Vault
+This example deploys a Azure Virtual Network, Subnet, 2 VMs with a Public IPs associated with them, and Key Vault
 
 
 
