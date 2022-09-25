@@ -1,6 +1,6 @@
-# Azure Virtual Network, Subnet, VM, Key Vault
+# SQL Server, Storage Account, Azure Function App
 
-This example deploys a Azure Virtual Network, Subnet, 2 VMs with a Public IPs associated with them, and Key Vault
+This example deploys an Azure SQL virtual server, storage account, azure app service plan, and a function app
 
 
 
