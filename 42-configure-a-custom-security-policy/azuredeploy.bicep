@@ -12,8 +12,6 @@ param adminUsername string
 @secure()
 param adminPassword string
 
-@description('Key vault name, must be unique')
-param kvName string
 
 /////////////////////
 // variable section

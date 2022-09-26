@@ -1,6 +1,6 @@
 # Azure Virtual Network, Subnet, VM
 
-This example deploys a Azure Virtual Network, Subnet, 1 VMs with a Public IPs associated it
+This example deploys a Azure Virtual Network, Subnet, 1 VM with a Public IPs associated it
 
 
 

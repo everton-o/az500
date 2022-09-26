@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.10.61.36676",
-      "templateHash": "9259870572357733321"
+      "templateHash": "8365933945961703991"
     }
   },
   "parameters": {
@@ -19,12 +19,6 @@
       "type": "secureString",
       "metadata": {
         "description": "password to access the VMs"
-      }
-    },
-    "kvName": {
-      "type": "string",
-      "metadata": {
-        "description": "Key vault name, must be unique"
       }
     }
   },
