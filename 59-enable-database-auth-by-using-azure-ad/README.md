@@ -1,7 +1,7 @@
-# Azure Key Vault, Function App, Storage Account, and SQL Database
+# SQL Server, Key Vault, Storage Account, and Log Analytics
 
 
-This example deploys the following services Azure Key Vault, Function App, Storage Account, and SQL Database
+This example deploys SQL Server with a SampleDB, Key Vault, Log Analytics, and Storage Account.
 
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Feverton-o%2Faz500%2Fmain%2F59-enable-database-auth-by-using-azure-ad%2Fazuredeploy.json)
