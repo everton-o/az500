@@ -1,10 +1,10 @@
 ---
 lab:
-    title: ' 12 - Service Endpoints and Securing Storage'
-    module: 'Module 03 - Secure data and applications'
+    title: ' 12 - Plan and Implement Virtual Network Service Endpoints'
+    module: 'Module 02 - Secure Networking'
 ---
 
-# Lab 12: Service Endpoints and Securing Storage
+# Lab 12: Plan and Implement Virtual Network Service Endpoints
 # Student lab manual
 
 ## Lab scenario

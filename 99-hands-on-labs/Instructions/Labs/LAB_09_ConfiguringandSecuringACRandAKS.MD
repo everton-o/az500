@@ -1,10 +1,10 @@
 ---
 lab:
-    title: '09 - Configuring and Securing ACR and AKS'
-    module: 'Module 02 - Implement Platform Protection'
+    title: '09 - Manage access to Azure Container Registry (ACR) and Azure Kubernetes Service (AKS)'
+    module: 'Module 03 - Secure Compute, Storage, and Databases'
 ---
 
-# Lab 09: Configuring and Securing ACR and AKS
+# Lab 09: Manage access to Azure Container Registry (ACR) and Azure Kubernetes Service (AKS)
 # Student lab manual
 
 ## Lab scenario

@@ -1,7 +1,7 @@
 ---
 lab:
     title: '14 - Microsoft Defender for Cloud'
-    module: 'Module 04 - Microsoft Defender for Cloud'
+    module: 'Module 04 - Manage security operations'
 ---
 
 # Lab 14: Microsoft Defender for Cloud

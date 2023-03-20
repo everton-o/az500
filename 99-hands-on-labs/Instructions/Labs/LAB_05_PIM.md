@@ -1,10 +1,10 @@
 ---
 lab:
-    title: '05 - Azure AD Privileged Identity Management'
+    title: '05 - Configure Azure AD Privileged Identity Management (PIM)'
     module: 'Module 01 - Manage Identity and Access'
 ---
 
-# Lab 05: Azure AD Privileged Identity Management
+# Lab 05: Configure Azure AD Privileged Identity Management (PIM)
 # Student lab manual
 
 ## Lab scenario

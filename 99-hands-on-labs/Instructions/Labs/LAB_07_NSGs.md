@@ -1,10 +1,10 @@
 ---
 lab:
-    title: '07 - Network Security Groups and Application Security Groups'
-    module: 'Module 02 - Implement Platform Protection'
+    title: '07 - Plan and implement Network Security Groups (NSGs) and Application Security Groups (ASGs)'
+    module: 'Module 02 - Secure Networking'
 ---
 
-# Lab 07: Network Security Groups and Application Security Groups
+# Lab 07: Plan and implement Network Security Groups (NSGs) and Application Security Groups (ASGs)
 # Student lab manual
 
 ## Lab scenario

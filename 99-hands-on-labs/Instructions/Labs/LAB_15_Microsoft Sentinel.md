@@ -1,7 +1,7 @@
 ---
 lab:
     title: '15 - Microsoft Sentinel'
-    module: 'Module 04 - Manage Security Operations'
+    module: 'Module 04 - Manage security operations'
 ---
 
 # Lab 15: Microsoft Sentinel

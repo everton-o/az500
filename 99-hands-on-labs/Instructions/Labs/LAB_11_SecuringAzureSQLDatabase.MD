@@ -1,7 +1,7 @@
 ---
 lab:
     title: '11 - Securing Azure SQL Database'
-    module: 'Module 03 - Secure data and applications'
+    module: 'Module 03 - Secure Compute, Storage, and Databases'
 ---
 
 # Lab 11: Securing Azure SQL Database
