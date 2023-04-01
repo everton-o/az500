@@ -12,6 +12,21 @@ param subnetName1 string = 'data-subnet-10.0.1.0-24'
 @description('subnet address prefix')
 param subnetAddressPrefix1 string = '10.0.1.0/24'
 
+
+@description('subnet name')
+param subnetName2 string = 'web-subnet-10.0.2.0-24'
+
+@description('subnet address prefix')
+param subnetAddressPrefix2 string = '10.0.2.0/24'
+
+
+@description('subnet name')
+param subnetName3 string = 'nva-subnet-10.0.3.0-24'
+
+@description('subnet address prefix')
+param subnetAddressPrefix3 string = '10.0.3.0/24'
+
+
 @description('user to access the VMs')
 param adminUsername string
 
@@ -43,11 +58,18 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-01-01' = {
         }
       }
       {
-        name: 'AzureFirewallSubnet'
+        name: subnetName2
         properties: {
-          addressPrefix: '10.0.0.0/26'
+          addressPrefix: subnetAddressPrefix2
         }
       }
+      {
+        name: subnetName3
+        properties: {
+          addressPrefix: subnetAddressPrefix3
+        }
+      }
+      
     ]
   }
 }
@@ -69,7 +91,7 @@ resource publicIp 'Microsoft.Network/publicIPAddresses@2022-01-01' = [for i in r
 
 // Deploy Network Interface Card
 resource networkCard 'Microsoft.Network/networkInterfaces@2021-02-01' = [for i in range(0, resourceCount):  {
-  name: 'nic-data-${i}'
+  name: 'nic-${i == 0 ? 'data' : i == 1 ? 'web' : 'nva'}${i}'
   location: location
   properties: {
     ipConfigurations: [
@@ -92,7 +114,7 @@ resource networkCard 'Microsoft.Network/networkInterfaces@2021-02-01' = [for i i
 
 // Deploy Windows VM
 resource windowsVM 'Microsoft.Compute/virtualMachines@2020-12-01' = [for i in range(0, resourceCount): {
-  name: i == 0 ? 'web' : i == 1 ? 'data' : 'nva'
+  name: i == 0 ? 'data' : i == 1 ? 'web' : 'nva'
   location: location
   identity: {
     type: 'SystemAssigned'
