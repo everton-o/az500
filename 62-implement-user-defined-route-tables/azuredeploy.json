@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.15.31.15270",
-      "templateHash": "12957198734357513007"
+      "templateHash": "7956371877274124034"
     }
   },
   "parameters": {
@@ -179,7 +179,7 @@
           "vmSize": "Standard_B2s"
         },
         "osProfile": {
-          "computerName": "[format('win-{0}', if(equals(range(0, variables('resourceCount'))[copyIndex()], 0), 'web', if(equals(range(0, variables('resourceCount'))[copyIndex()], 1), 'data', 'nva')))]",
+          "computerName": "[if(equals(range(0, variables('resourceCount'))[copyIndex()], 0), 'data', if(equals(range(0, variables('resourceCount'))[copyIndex()], 1), 'web', 'nva'))]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]",
           "allowExtensionOperations": true,
