@@ -124,7 +124,7 @@ resource windowsVM 'Microsoft.Compute/virtualMachines@2020-12-01' = [for i in ra
       vmSize: 'Standard_B2s'
     }
     osProfile: {
-      computerName: 'win-${i == 0 ? 'web' : i == 1 ? 'data' : 'nva'}'
+      computerName: i == 0 ? 'data' : i == 1 ? 'web' : 'nva'
       adminUsername: adminUsername
       adminPassword: adminPassword
       allowExtensionOperations: true
