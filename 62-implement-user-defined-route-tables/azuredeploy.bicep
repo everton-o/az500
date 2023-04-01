@@ -24,35 +24,6 @@ var location = resourceGroup().location
 var resourceCount = 3
 
 
-// deploy log analytics 
-resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' = {
-  name: uniqueString('loganalytics', resourceGroup().id)
-  location: location
-}
-
-
-// deploy automation accounts
-resource automationAccount 'Microsoft.Automation/automationAccounts@2021-06-22' = {
-  name: uniqueString('automation', resourceGroup().id)
-  location: location
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
-    disableLocalAuth: false
-    encryption: {
-      identity: {}
-      keySource: 'Microsoft.Automation'
-    }
-    publicNetworkAccess: false
-    sku: {
-      capacity: null
-      family: null
-      name: 'Basic' 
-    }
-  }
-}
-
 
 // deploy virtual network
 resource vnet 'Microsoft.Network/virtualNetworks@2022-01-01' = {
