@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.15.31.15270",
-      "templateHash": "4602005389303260159"
+      "templateHash": "12957198734357513007"
     }
   },
   "parameters": {
@@ -33,6 +33,34 @@
     "subnetAddressPrefix1": {
       "type": "string",
       "defaultValue": "10.0.1.0/24",
+      "metadata": {
+        "description": "subnet address prefix"
+      }
+    },
+    "subnetName2": {
+      "type": "string",
+      "defaultValue": "web-subnet-10.0.2.0-24",
+      "metadata": {
+        "description": "subnet name"
+      }
+    },
+    "subnetAddressPrefix2": {
+      "type": "string",
+      "defaultValue": "10.0.2.0/24",
+      "metadata": {
+        "description": "subnet address prefix"
+      }
+    },
+    "subnetName3": {
+      "type": "string",
+      "defaultValue": "nva-subnet-10.0.3.0-24",
+      "metadata": {
+        "description": "subnet name"
+      }
+    },
+    "subnetAddressPrefix3": {
+      "type": "string",
+      "defaultValue": "10.0.3.0/24",
       "metadata": {
         "description": "subnet address prefix"
       }
@@ -74,9 +102,15 @@
             }
           },
           {
-            "name": "AzureFirewallSubnet",
+            "name": "[parameters('subnetName2')]",
             "properties": {
-              "addressPrefix": "10.0.0.0/26"
+              "addressPrefix": "[parameters('subnetAddressPrefix2')]"
+            }
+          },
+          {
+            "name": "[parameters('subnetName3')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetAddressPrefix3')]"
             }
           }
         ]
@@ -106,7 +140,7 @@
       },
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2021-02-01",
-      "name": "[format('nic-data-{0}', range(0, variables('resourceCount'))[copyIndex()])]",
+      "name": "[format('nic-{0}{1}', if(equals(range(0, variables('resourceCount'))[copyIndex()], 0), 'data', if(equals(range(0, variables('resourceCount'))[copyIndex()], 1), 'web', 'nva')), range(0, variables('resourceCount'))[copyIndex()])]",
       "location": "[variables('location')]",
       "properties": {
         "ipConfigurations": [
@@ -135,7 +169,7 @@
       },
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2020-12-01",
-      "name": "[if(equals(range(0, variables('resourceCount'))[copyIndex()], 0), 'web', if(equals(range(0, variables('resourceCount'))[copyIndex()], 1), 'data', 'nva'))]",
+      "name": "[if(equals(range(0, variables('resourceCount'))[copyIndex()], 0), 'data', if(equals(range(0, variables('resourceCount'))[copyIndex()], 1), 'web', 'nva'))]",
       "location": "[variables('location')]",
       "identity": {
         "type": "SystemAssigned"
@@ -171,7 +205,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', format('nic-data-{0}', range(0, variables('resourceCount'))[range(0, variables('resourceCount'))[copyIndex()]]))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', format('nic-{0}{1}', if(equals(range(0, variables('resourceCount'))[range(0, variables('resourceCount'))[copyIndex()]], 0), 'data', if(equals(range(0, variables('resourceCount'))[range(0, variables('resourceCount'))[copyIndex()]], 1), 'web', 'nva')), range(0, variables('resourceCount'))[range(0, variables('resourceCount'))[copyIndex()]]))]"
             }
           ]
         },
@@ -182,7 +216,7 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', format('nic-data-{0}', range(0, variables('resourceCount'))[range(0, variables('resourceCount'))[copyIndex()]]))]"
+        "[resourceId('Microsoft.Network/networkInterfaces', format('nic-{0}{1}', if(equals(range(0, variables('resourceCount'))[range(0, variables('resourceCount'))[copyIndex()]], 0), 'data', if(equals(range(0, variables('resourceCount'))[range(0, variables('resourceCount'))[copyIndex()]], 1), 'web', 'nva')), range(0, variables('resourceCount'))[range(0, variables('resourceCount'))[copyIndex()]]))]"
       ]
     }
   ]
