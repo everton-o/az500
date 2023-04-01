@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.15.31.15270",
-      "templateHash": "12801528833484362246"
+      "templateHash": "4602005389303260159"
     }
   },
   "parameters": {
@@ -55,34 +55,6 @@
     "resourceCount": 3
   },
   "resources": [
-    {
-      "type": "Microsoft.OperationalInsights/workspaces",
-      "apiVersion": "2021-12-01-preview",
-      "name": "[uniqueString('loganalytics', resourceGroup().id)]",
-      "location": "[variables('location')]"
-    },
-    {
-      "type": "Microsoft.Automation/automationAccounts",
-      "apiVersion": "2021-06-22",
-      "name": "[uniqueString('automation', resourceGroup().id)]",
-      "location": "[variables('location')]",
-      "identity": {
-        "type": "SystemAssigned"
-      },
-      "properties": {
-        "disableLocalAuth": false,
-        "encryption": {
-          "identity": {},
-          "keySource": "Microsoft.Automation"
-        },
-        "publicNetworkAccess": false,
-        "sku": {
-          "capacity": null,
-          "family": null,
-          "name": "Basic"
-        }
-      }
-    },
     {
       "type": "Microsoft.Network/virtualNetworks",
       "apiVersion": "2022-01-01",
